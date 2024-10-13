@@ -14,6 +14,12 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
+	// Get path of current directory
+	workDir, _ := os.Getwd()
+	// Serve static files from the ./static directory
+	filesDir := http.Dir(filepath.Join(workDir, "static"))
+	FileServer(r, "/", filesDir)
+
 	// Basic handler
 	r.Get("/welcome", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("welcome"))
@@ -24,12 +30,6 @@ func main() {
 		param := chi.URLParam(r, "param")
 		w.Write([]byte("welcome " + param))
 	})
-
-	// Get path of current directory
-	workDir, _ := os.Getwd()
-	// Serve static files from the ./static directory
-	filesDir := http.Dir(filepath.Join(workDir, "static"))
-	FileServer(r, "/files", filesDir)
 
 	http.ListenAndServe(":3000", r)
 }
